@@ -3,14 +3,25 @@
 }
 <h2>@ViewBag.Title</h2>
 
+<p style="color: #0000ff;">
+    @ViewBag.Message
+</p>
+
 <form action="~/Movies/Add" method="post">
     <div class="form-group">
         <label for="tbName">Name</label>
         <input type="text" class="form-control" id="tbName" name="Name"/>
     </div>
     <div class="form-group">
-        <label for="tbProductionYear">ProductionYear</label>
-        <input type="text" class="form-control" id="tbProductionYear" name="ProductionYear"/>
+        <label for="ddlProductionYear">ProductionYear</label>
+        <select id="ddlProductionYear" name="ProductionYear" class="form-control">
+            @for(int i=DateTime.Now.Year; i>=1970; i--)
+            {
+                <option value="@i">@i</option>
+            }
+            @*<option value="2020" selected>2020</option>
+            <option value="2019">2019</option>*@
+        </select>
     </div>
     <div class="form-group">
         <label for="tbBoxOfficeReturn">BoxOfficeReturn</label>

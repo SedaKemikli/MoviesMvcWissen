@@ -6,9 +6,15 @@
 <h2>@ViewBag.Title</h2>
 <a href="~/Movies/Add">Add Movie</a>
 <br />
-<span>@Model.Count records found</span>
+<label class="text-success">@TempData["Info"]</label>
+<br/>
+@*<span>@Model.Count records found</span>*@
+<span>@ViewBag.count records found.</span>
+@*<span>@ViewData["count"] records found.</span>*@
 <table class="table">
     <tr>
+        <td>
+            </td>
         <td>
             <b>Name</b>
         </td>
@@ -20,8 +26,12 @@
         </td>
     </tr>
     @foreach (var movie in Model)
-    {
+     {
         <tr>
+            <td>
+                @Html.ActionLink("Edit", "Edit", new { id = movie.Id }) |
+                @Html.ActionLink("Delete", "Delete", new { id = movie.Id })
+            </td>
             <td>
                 @{
                     @movie.Name
@@ -38,5 +48,5 @@
                 }
             </td>
         </tr>
-    }
+     }
 </table>
