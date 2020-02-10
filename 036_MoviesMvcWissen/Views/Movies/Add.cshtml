@@ -1,5 +1,6 @@
 ﻿@{
     ViewBag.Title = "Add Movie";
+    var directors = (MultiSelectList)ViewData["directors"];
 }
 <h2>@ViewBag.Title</h2>
 
@@ -16,9 +17,9 @@
         <label for="ddlProductionYear">ProductionYear</label>
         <select id="ddlProductionYear" name="ProductionYear" class="form-control">
             @for(int i=DateTime.Now.Year; i>=1970; i--)
-            {
+             {
                 <option value="@i">@i</option>
-            }
+             }
             @*<option value="2020" selected>2020</option>
             <option value="2019">2019</option>*@
         </select>
@@ -27,6 +28,16 @@
         <label for="tbBoxOfficeReturn">BoxOfficeReturn</label>
         <input type="text" class="form-control" id="tbBoxOfficeReturn" name="BoxOfficeReturn"/>
     </div>
+    <div class="form-group">
+        <label for="ddlDirectors">Directors</label>
+        <select id="ddlDirectors" class="form-control" name="Directors" multiple>
+            @foreach (var director in directors)
+             {
+                <option value="@director.Value">@director.Text</option>
+             }
+        </select>
+    </div>
+
     <button type="submit" class="btn btn-primary">Save</button>
     &nbsp;
     <button type="reset" class="btn btn-warning">Clear</button>
