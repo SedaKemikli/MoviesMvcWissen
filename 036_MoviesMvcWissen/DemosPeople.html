@@ -1,0 +1,61 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>People | jQuery AJAX</title>
+    <script src="Scripts/jquery-3.0.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $.getJSON("./Demos/GetPeopleJson", function (response) {
+                $.each(response, function (i, data) {
+                    $("#ul_users").append("<li>Id: " + data.Id + "-Full Name: " + data.FullName + "- Identity No: " + data.IdentityNo +
+                        "-University Graduate: " + (data.GraduatedFromUniversity == true ? "Yes" : "No") +
+                        "-BirthDate: " + data.BirthDate + "</li>");
+                });
+
+            });
+
+            $("#bRefresh").click(function () {
+                clearUsers();
+                $.ajax({
+                    url: "./Demos/GetPeopleJson",
+                    type: "get",
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    cache: false,
+                    success: function (response, response_textstatus, response_jqxhr) {
+                        //console.log("Text Status: " + response_textstatus + "-jqxhr: " + response_jqxhr.status);
+                        console.log(response);
+                        var html = '<ul id="ul_users">';
+                        for (var i = 0; i < response.length; i++) {
+                            html += "<li> Id: " + response[i].Id + "-Full Name: " + response[i].FullName + "-Identity No: " + response[i].IdentityNo +
+                                "-University Graduate: " + (response[i].GraduatedFromUniversity == true ? "Yes" : "No") +
+                                "-BirthDate: " + response[i].BirthDate + "</li>";
+                        }
+                        html += "</ul>";
+                        $("#div_users").html(html);
+                    },
+                    error: function (response_textstatus, response_jqxhr) {
+                        alert("An error occured!");
+                        console.log("Text Status: " + response_textstatus + "-jqxhr: " + response_jqxhr.status);
+                    }
+
+                });
+            });
+        });
+        function clearUsers() {
+            $("#div_users").empty();
+        }
+    </script>
+
+</head>
+<body>
+    <h2>People</h2>
+    <div id="div_users">
+        <ul id="ul_users"></ul>
+    </div>
+    <button id="bRefresh">Refresh</button>&nbsp;
+    <button id="bClear" onclick="clearUsers();">Clear</button>
+
+</body>
+</html>

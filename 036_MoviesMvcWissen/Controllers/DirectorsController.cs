@@ -2,12 +2,15 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Entity;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Web;
 using System.Web.Mvc;
 using _036_MoviesMvcWissen.Contexts;
 using _036_MoviesMvcWissen.Entities;
+using _036_MoviesMvcWissen.Models;
+using _036_MoviesMvcWissen.Models.ViewModel;
 
 namespace _036_MoviesMvcWissen.Controllers
 {
@@ -18,7 +21,12 @@ namespace _036_MoviesMvcWissen.Controllers
         // GET: Directors
         public ActionResult Index()
         {
-            return View(db.Directors.ToList());
+            var model = new DirectorsIndexViewModel()
+            {
+                Directors = db.Directors.ToList()
+            };
+
+            return View(model);
         }
 
         // GET: Directors/Details/5
@@ -39,6 +47,13 @@ namespace _036_MoviesMvcWissen.Controllers
         // GET: Directors/Create
         public ActionResult Create()
         {
+            
+            var movies = db.Movies.Select(e => new SelectListItem()
+            {
+                Value = e.Id.ToString(),
+                Text = e.Name
+            }).ToList();
+            ViewBag.Movies = new MultiSelectList(movies, "Value", "Text");
             return View();
         }
 
@@ -47,10 +62,10 @@ namespace _036_MoviesMvcWissen.Controllers
         // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        //public ActionResult Create([Bind(Include = "Id,Name,Surname,Retired")] Director director)
+        //public ActionResult Create([Bind(Include = "Id,Name,Surname,Retired")] Director director , List<int> Movies)
         [ActionName("Create")]
         //public ActionResult CreateNew()
-        public ActionResult CreateNew(FormCollection formCollection)
+        public ActionResult CreateNew(FormCollection formCollection, List<int> Movies)
         {
             var director = new Director()
             {
@@ -61,6 +76,7 @@ namespace _036_MoviesMvcWissen.Controllers
             };
             //var retired = Request.Form["Retired"];
             var retired = formCollection["Retired"];
+            var movieIds = formCollection["movieIds"].Split(',');
             director.Retired = true;
             if (retired.Equals("false"))
                 director.Retired = false;
@@ -83,22 +99,67 @@ namespace _036_MoviesMvcWissen.Controllers
                 return RedirectToAction("Index");
             }
 
+            if (ModelState.IsValid)
+            {
+                director.MovieDirectors = Movies.Select(e => new MovieDirector()
+                {
+                    MovieId = Convert.ToInt32(e),
+                    DirectorId = director.Id
+                }).ToList();
+                db.Directors.Add(director);
+                db.SaveChanges();
+                return RedirectToAction("Index");
+            }
             return View(director);
         }
 
         // GET: Directors/Edit/5
+        #region EditGet 1
+        //public ActionResult Edit(int? id) //1
+        //{
+
+        //    var model = db.Directors.Find(id.Value);
+        //    if (id == null)
+        //    {
+        //        return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+        //    }
+        //    Director director = db.Directors.Find(id);
+        //    if (director == null)
+        //    {
+        //        return HttpNotFound();
+        //    }
+        //    var movies = db.Movies.Select(e => new MovieModel()
+        //    {
+        //        Id = e.Id,
+        //        Name = e.Name
+        //    }).ToList();
+        //    var moviesIds = model.MovieDirectors.Select(e => e.MovieId).ToList();
+        //    ViewBag.Movies = new MultiSelectList(movies, "Id", "Name", moviesIds);
+        //    return View(model);
+        //}
+
+        #endregion
+
         public ActionResult Edit(int? id)
         {
-            if (id == null)
-            {
+            if (!id.HasValue)
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-            Director director = db.Directors.Find(id);
-            if (director == null)
+            var movies = db.Movies.Select(e => new SelectListItem()
             {
-                return HttpNotFound();
-            }
-            return View(director);
+                Value= e.Id.ToString(),
+                Text= e.Name
+            }).ToList();
+            var director = db.Directors.Find(id.Value);
+            List<int> _movieIds = director.MovieDirectors.Select(e => e.MovieId).ToList();
+
+            DirectorsEditViewModel model = new DirectorsEditViewModel();
+
+            model.Director = director;
+            model.movieIds = _movieIds;
+            model.Movies = new MultiSelectList(movies,"Value","Text", model.movieIds);
+           
+            return View("EditNew",model);
+
         }
 
         // POST: Directors/Edit/5
@@ -106,15 +167,57 @@ namespace _036_MoviesMvcWissen.Controllers
         // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "Id,Name,Surname,Retired")] Director director)
+        #region EditPost 1
+        //public ActionResult Edit([Bind(Include = "Id,Name,Surname,Retired")] Director director, List<int> moviesIds)
+        //{
+        //    var dbDirector = db.Directors.Find(director.Id);
+
+        //    dbDirector.Name = director.Name;
+        //    dbDirector.Surname = director.Surname;
+        //    dbDirector.Retired = director.Retired;
+        //    dbDirector.MovieDirectors = new List<MovieDirector>();
+        //    var movieDirectors = db.MovieDirectors.Where(e => e.DirectorId == director.Id).ToList();
+        //    foreach (var movieDirector in movieDirectors)
+        //    {
+        //        db.MovieDirectors.Remove(movieDirector);
+        //    }
+        //    foreach (var movieId in moviesIds)
+        //    {
+        //        var movieDirector = new MovieDirector()
+        //        {
+        //            DirectorId = director.Id,
+        //            MovieId = movieId
+        //        };
+        //        dbDirector.MovieDirectors.Add(movieDirector);
+        //    }
+        //    db.Entry(dbDirector).State = EntityState.Modified;
+        //    db.SaveChanges();
+        //    return RedirectToRoute(new { controller = "Directors", action = "Index" });
+        //}
+        #endregion
+        public ActionResult Edit(DirectorsEditViewModel directorsEditViewModel)
         {
             if (ModelState.IsValid)
             {
+                var director = db.Directors.Find(directorsEditViewModel.Director.Id);
+                director.Name = directorsEditViewModel.Director.Name;
+                director.Surname = directorsEditViewModel.Director.Surname;
+                director.Retired = directorsEditViewModel.Director.Retired;
+                var movieDirectors = db.MovieDirectors.Where(e => e.DirectorId == director.Id).ToList();
+                foreach (var movieDirector in movieDirectors)
+                {
+                    db.MovieDirectors.Remove(movieDirector);
+                }
+                director.MovieDirectors = directorsEditViewModel.movieIds.Select(e => new MovieDirector()
+                {
+                    DirectorId = director.Id,
+                    MovieId = e
+                }).ToList();
                 db.Entry(director).State = EntityState.Modified;
                 db.SaveChanges();
                 return RedirectToAction("Index");
             }
-            return View(director);
+            return View(directorsEditViewModel);
         }
 
         // GET: Directors/Delete/5

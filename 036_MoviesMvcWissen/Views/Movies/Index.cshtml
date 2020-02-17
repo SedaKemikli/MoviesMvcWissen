@@ -1,25 +1,43 @@
-﻿@model List<_036_MoviesMvcWissen.Entities.Movie>
+﻿@*@model List<_036_MoviesMvcWissen.Entities.Movie>*@
+    @model _036_MoviesMvcWissen.Models.ViewModel.MoviesIndexViewModel
+
+@using _036_MoviesMvcWissen.Helpers
 
 @{
     ViewBag.Title = "Movies";
 }
-<h2>@ViewBag.Title</h2>
+
 
 @*@Html.Action("Welcome")*@
 @{ 
     Html.RenderAction("Welcome");
 }
+<h2>@ViewBag.Title</h2>
+@using (Html.BeginForm("Index", "Movies", FormMethod.Get))
+{
 
-<br />
+ <table class="table">
+    <tr>
+        <td style="width:20%;">
+        Production Year:</td>
+        <td>@Html.DropDownList("YearId", Model.Years,"--All--", new { @class = "form-control" })</td>
+    </tr>
+    <tr>
+        <td colspan="2">
+            @Html.Button("Filter","btn btn-primary")
+        </td>
+    </tr>
+ </table>
+}
 <a href="~/Movies/Add">Add Movie</a>
 <br />
 <label class="text-success">@TempData["Info"]</label>
 <br/>
 @*<span>@Model.Count records found</span>*@
-<span>@ViewBag.count records found.</span>
+@*<span>@ViewBag.count records found.</span>*@
 @*<span>@ViewData["count"] records found.</span>*@
 <table class="table">
-    <tr>
+    @*<tr>
         <td>
             </td>
         <td>
@@ -31,9 +49,9 @@
         <td>
             <b>Box Office Return</b>
         </td>
-    </tr>
-    @foreach (var movie in Model)
-     {
+    </tr>*@
+    @foreach (var movie in Model.Movies)
+    {
         <tr>
             <td>
                 @Html.ActionLink(" ", "Details", new { id = movie.Id }, new { @class = "fa fa-info text-warning" })
@@ -58,5 +76,5 @@
                 }
             </td>
         </tr>
-     }
+                    }
 </table>

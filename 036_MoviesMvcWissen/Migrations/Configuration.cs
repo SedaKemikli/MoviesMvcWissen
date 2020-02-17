@@ -125,6 +125,14 @@
                     }
                 );
             }
+            context.Users.AddOrUpdate(e => e.UserName,
+                 new User()
+                 {
+                     UserName="leo",
+                     Password="cagil"
+                 }
+            
+            );
         }
     }
 }
