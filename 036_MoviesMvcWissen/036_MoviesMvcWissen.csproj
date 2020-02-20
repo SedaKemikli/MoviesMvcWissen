@@ -534,6 +534,7 @@
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\LoginController.cs" />
     <Compile Include="Controllers\MoviesController.cs" />
+    <Compile Include="Controllers\ReportsController.cs" />
     <Compile Include="Controllers\ReviewsController.cs" />
     <Compile Include="Entities\Director.cs" />
     <Compile Include="Entities\Movie.cs" />
@@ -575,16 +576,22 @@
     <Compile Include="Migrations\202002181718204_MoviesV07.designer.cs">
       <DependentUpon>202002181718204_MoviesV07.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202002201657368_MoviesV08.cs" />
+    <Compile Include="Migrations\202002201657368_MoviesV08.designer.cs">
+      <DependentUpon>202002201657368_MoviesV08.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\Demos\PersonModelClientModel.cs" />
     <Compile Include="Models\Demos\Templates\PersonModel.cs" />
     <Compile Include="Models\DirectorModel.cs" />
     <Compile Include="Models\DropDownListModel.cs" />
     <Compile Include="Models\MovieModel.cs" />
+    <Compile Include="Models\MovieReportsModel.cs" />
     <Compile Include="Models\ViewModel\DemosGetPeopleAjaxViewModel.cs" />
     <Compile Include="Models\ViewModel\DirectorsEditViewModel.cs" />
     <Compile Include="Models\ViewModel\DirectorsIndexViewModel.cs" />
     <Compile Include="Models\ViewModel\MoviesIndexViewModel.cs" />
+    <Compile Include="Models\ViewModel\ReportsMoviesViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Validations\FluentValidation\DirectorValidator.cs" />
     <Compile Include="Validations\FluentValidation\UserValidator.cs" />
@@ -644,6 +651,8 @@
     <Content Include="Views\Demos\GetPeopleAjax.cshtml" />
     <Content Include="Views\Demos\_PeopleList.cshtml" />
     <Content Include="Views\Demos\AddPersonAjaxSil.cshtml" />
+    <Content Include="Views\Reports\Movies.cshtml" />
+    <Content Include="Views\Reports\_Movies.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -654,6 +663,7 @@
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="Areas\Admin\Models\" />
+    <Folder Include="Files\Movies\" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Migrations\202002050959369_MoviesV01.resx">
@@ -676,6 +686,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202002181718204_MoviesV07.resx">
       <DependentUpon>202002181718204_MoviesV07.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202002201657368_MoviesV08.resx">
+      <DependentUpon>202002201657368_MoviesV08.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

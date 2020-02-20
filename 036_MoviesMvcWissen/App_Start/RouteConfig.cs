@@ -12,6 +12,27 @@ namespace _036_MoviesMvcWissen
         public static void RegisterRoutes(RouteCollection routes)
         {
             routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
+            routes.MapMvcAttributeRoutes();
+
+            // routes.Add( //Url ../getreviews yapar.
+            //     "GetReviews", new Route("getreviews", new RouteValueDictionary
+            //     (
+            //         new { controller = "Reviews", action = "Index" }
+            //     ), new MvcRouteHandler())
+            //);
+
+            routes.MapRoute( // routes.Add ile aynı işlemi yapar.
+                name: "GetReviews",
+                url: "getreviews",
+                defaults: new { controller = "Reviews", action = "Index", id = UrlParameter.Optional },
+                constraints: new { httpMethod = new HttpMethodConstraint("POST", "GET") }
+                );
+
+            routes.MapRoute(
+                name: "CreateReview",
+                url: "createreview",
+                defaults: new { controller = "Reviews", action = "Create", id = UrlParameter.Optional }
+                );
 
             routes.MapRoute(
                 name: "Default",

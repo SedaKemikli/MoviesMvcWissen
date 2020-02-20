@@ -217,8 +217,16 @@ namespace _036_MoviesMvcWissen.Controllers
 
         {
             return RedirectPermanent("~/DemosPeople.html");
-            #endregion
-
         }
+        #endregion
+
+
+        #region Route Attribute
+        [Route("addtwonumbers/{no1}/{no2}")]
+        public ActionResult AddNumbers(int no1, int no2)
+        {
+            return Content((no1 + no2).ToString());
+        }
+        #endregion
     }
 }

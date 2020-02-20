@@ -23,15 +23,16 @@ namespace _036_MoviesMvcWissen.Controllers
             return View(reviews.ToList());
         }
 
-        [AllowAnonymous]
         // GET: Reviews/Details/5
-        public ActionResult Details(int? id)
+        [Route("Reviews/Details/{no?}")]
+        [AllowAnonymous]
+        public ActionResult Details(int? no)
         {
-            if (id == null)
+            if (no == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Review review = db.Reviews.Find(id);
+            Review review = db.Reviews.Find(no);
             if (review == null)
             {
                 return HttpNotFound();
@@ -39,6 +40,8 @@ namespace _036_MoviesMvcWissen.Controllers
             return View(review);
         }
 
+
+        [Route("CreateReview")]
         // GET: Reviews/Create
         public ActionResult Create()
         {

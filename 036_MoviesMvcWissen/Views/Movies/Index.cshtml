@@ -13,21 +13,32 @@
     Html.RenderAction("Welcome");
 }
 <h2>@ViewBag.Title</h2>
+
+@Html.ActionLink("Movie Reports", "Movies", "Reports")
+<br/>
+<br/>
+
 @using (Html.BeginForm("Index", "Movies", FormMethod.Get))
 {
 
- <table class="table">
+<table class="table">
+    <tr>
+        <td>
+          
+        </td>
+    </tr>
     <tr>
         <td style="width:20%;">
-        Production Year:</td>
-        <td>@Html.DropDownList("YearId", Model.Years,"--All--", new { @class = "form-control" })</td>
+            Production Year:
+        </td>
+        <td>@Html.DropDownList("YearId", Model.Years, "--All--", new { @class = "form-control" })</td>
     </tr>
     <tr>
         <td colspan="2">
-            @Html.Button("Filter","btn btn-primary")
+            @Html.Button("Filter", "btn btn-primary")
         </td>
     </tr>
- </table>
+</table>
 }
 <a href="~/Movies/Add">Add Movie</a>
 <br />
@@ -60,6 +71,16 @@
                 &nbsp;
                 @Html.ActionLink(" ", "Delete", new { id = movie.Id }, new { @class = "fa fa-trash text-danger" })
             </td>
+            <td>
+                @{ 
+                    if (movie.FilePath != null)
+                    {
+
+                    <img src="../../@movie.FilePath" width="200" height="200" />
+
+                    }
+                 }
+                </td>
             <td>
                 @{
                     @movie.Name
