@@ -143,16 +143,14 @@ namespace _036_MoviesMvcWissen.Controllers
             ViewData["directors"] = new MultiSelectList(directors, "Value", "Text");
             return View();
         }
-
-        [HttpPost]
-        public RedirectToRouteResult Add(string Name, int ProductionYear, string BoxOfficeReturn, List<int> Directors, HttpPostedFileBase Image)
+        private string CreateFilePath(string Name, HttpPostedFileBase Image)
         {
             string filePath = null;
             if (Image != null && Image.ContentLength > 0)
             {
                 var fileName = DateTime.Now.Year + DateTime.Now.Month.ToString().PadLeft(2, '0') + DateTime.Now.Day.ToString().PadLeft(2, '0')
                    + DateTime.Now.Hour.ToString().PadLeft(2, '0') + DateTime.Now.Minute.ToString().PadLeft(2, '0') + DateTime.Now.Second.ToString().PadLeft(2, '0')
-                   + DateTime.Now.Millisecond.ToString().PadLeft(3, '0') + "_" + Name.Replace(" ","") + Path.GetExtension(Image.FileName);
+                   + DateTime.Now.Millisecond.ToString().PadLeft(3, '0') + "_" + Name.Replace(" ", "") + Path.GetExtension(Image.FileName);
                 if (Path.GetExtension(fileName).ToLower().Equals(".jpg") || Path.GetExtension(fileName).ToLower().Equals(".jpeg")
                    || Path.GetExtension(fileName).ToLower().Equals(".png") || Path.GetExtension(fileName).ToLower().Equals(".bmp"))
                 {
@@ -166,6 +164,14 @@ namespace _036_MoviesMvcWissen.Controllers
                     filePath = ConfigurationManager.AppSettings["FilesFolder"] + "/Movies/" + fileName;
                 }
             }
+            return filePath;
+        }
+
+        [HttpPost]
+        public RedirectToRouteResult Add(string Name, int ProductionYear, string BoxOfficeReturn, List<int> Directors, HttpPostedFileBase Image)
+        {
+            string filePath = CreateFilePath(Name,Image);
+            
             var entity = new Movie()
             {
                Id=0,
@@ -183,13 +189,10 @@ namespace _036_MoviesMvcWissen.Controllers
             db.Movies.Add(entity);
             db.SaveChanges();
 
-            //var fileName = FilePathResult.GetFileName(Image.FileName);
             if (filePath != null)
             {
                 Image.SaveAs(Server.MapPath("~/" + filePath));
             }
-               
-            
             Debug.WriteLine("Added Entity Id: " + entity.Id);
             TempData["Info"] = "Record succesfully added to database.";
             return RedirectToAction("Index");
@@ -218,13 +221,16 @@ namespace _036_MoviesMvcWissen.Controllers
         }
 
         [HttpPost]
-        public ActionResult Edit([Bind(Include = "Id, Name, ProductionYear")]Movie movie,string BoxOfficeReturn,List<int> directorIds)
+        public ActionResult Edit([Bind(Include = "Id, Name, ProductionYear")]Movie movie,string BoxOfficeReturn,List<int> directorIds, HttpPostedFileBase Image)
         {
-            
+            string filePath = CreateFilePath(movie.Name, Image);
             var entity = db.Movies.SingleOrDefault(e => e.Id == movie.Id);
+            string oldFilePath = entity.FilePath;
             entity.Name = movie.Name;
             entity.ProductionYear = movie.ProductionYear;
             entity.BoxOfficeReturn = Convert.ToDouble(BoxOfficeReturn.Replace("," , "."), CultureInfo.InvariantCulture);
+            if(Image != null && Image.ContentLength > 0)
+                entity.FilePath = filePath;
             entity.MovieDirectors = new List<MovieDirector>();
             var movieDirectors = db.MovieDirectors.Where(e => e.MovieId == movie.Id).ToList();
             foreach(var movieDirector in movieDirectors)
@@ -242,6 +248,17 @@ namespace _036_MoviesMvcWissen.Controllers
             }
             db.Entry(entity).State = EntityState.Modified;
             db.SaveChanges();
+            if(filePath != null)
+            {
+                if (!String.IsNullOrWhiteSpace(oldFilePath))
+                {
+                    if(System.IO.File.Exists(Server.MapPath("~/" + oldFilePath)))
+                    {
+                        System.IO.File.Delete(Server.MapPath("~/" + oldFilePath));
+                    }
+                }
+                Image.SaveAs(Server.MapPath("~/" + filePath));
+            }
             TempData["Info"] = "Record succesfully updated in database.";
             return RedirectToRoute(new { controller = "Movies", action= "Index" });
         }
@@ -264,6 +281,10 @@ namespace _036_MoviesMvcWissen.Controllers
             var entity = db.Movies.Find(id);
             db.Movies.Remove(entity);
             db.SaveChanges();
+            if(entity.FilePath !=null && System.IO.File.Exists(Server.MapPath("~/" + entity.FilePath)))
+            {
+                System.IO.File.Delete(Server.MapPath("~/" + entity.FilePath));
+            }
             TempData["Info"] = "Record succesfully deleted from database.";
             return RedirectToAction("Index");
         }

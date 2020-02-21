@@ -72,15 +72,16 @@
                 @Html.ActionLink(" ", "Delete", new { id = movie.Id }, new { @class = "fa fa-trash text-danger" })
             </td>
             <td>
-                @{ 
+                @{
                     if (movie.FilePath != null)
                     {
+                        @*<img src="../../@movie.FilePath" class="img-thumbnail" />*@
+                        <img src="../../@movie.FilePath" width="200" height="200" />
 
-                    <img src="../../@movie.FilePath" width="200" height="200" />
 
                     }
-                 }
-                </td>
+                }
+            </td>
             <td>
                 @{
                     @movie.Name
